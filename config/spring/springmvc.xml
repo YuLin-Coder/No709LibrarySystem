@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	<!-- 配置Controller扫描 -->
+	<context:component-scan base-package="com.xian.controller" />
+
+	<!-- 配置注解驱动 -->
+	<mvc:annotation-driven />
+
+	<!-- 配置静态资源映射 -->
+	<mvc:resources location="/WEB-INF/css/" mapping="/css/**" />
+	<mvc:resources location="/WEB-INF/js/" mapping="/js/**" />
+	<mvc:resources location="/WEB-INF/assets/" mapping="/assets/**" />
+	<mvc:resources location="/WEB-INF/front/" mapping="/front/**" />
+	<mvc:resources location="/WEB-INF/images/" mapping="/images/**" />
+	<mvc:resources mapping="/fonts/**" location="/WEB-INF/fonts/" />
+
+	<!-- 配置拦截器 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/user/**" />
+			<!-- 配置不拦截请求的地址 -->
+			<mvc:exclude-mapping path="/index" />
+			<mvc:exclude-mapping path="/login" />
+			<bean class="com.xian.interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/**" />
+			<!-- 配置不拦截请求的地址 -->
+			<mvc:exclude-mapping path="/index" />
+			<mvc:exclude-mapping path="/login" />
+			<bean class="com.xian.interceptor.LoginInterceptor2" />
+		</mvc:interceptor>
+
+		<mvc:interceptor>
+			<mvc:mapping path="/sysadmin/**" />
+			<!-- 配置不拦截请求的地址 -->
+			<mvc:exclude-mapping path="/index" />
+			<mvc:exclude-mapping path="/login" />
+			<bean class="com.xian.interceptor.LoginInterceptor3" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- 配置视图解析器 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 前缀 -->
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<!-- 后缀 -->
+		<property name="suffix" value=".jsp" />
+	</bean>
+</beans>

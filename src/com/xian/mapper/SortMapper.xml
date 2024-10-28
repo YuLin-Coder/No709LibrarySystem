@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.SortMapper">
+	<sql id="sortColumn">
+		id,sname
+	</sql>
+	
+	<select id="selectAll" resultType="Sort">
+		select <include refid="sortColumn"/>
+		from sorts
+	</select>
+	
+	<select id="selectById" resultType="Sort">
+		select <include refid="sortColumn"/>
+		from sorts
+		where id=#{id}
+	</select>
+	
+	<select id="selectBySname" resultType="Sort">
+		select <include refid="sortColumn"/>
+		from sorts
+		where sname like concat('%',#{sname},'%')
+	</select>
+	
+	<insert id="insert">
+		insert into sorts
+			(sname)
+		values
+			(#{sname})	
+	</insert>
+	
+	<update id="update">
+		update sorts
+			set sname=#{sname}
+		where
+			id=#{id}	
+	</update>
+	
+	<delete id="delete">
+		delete from sorts
+		where id=#{id}
+	</delete>
+	
+	
+</mapper>

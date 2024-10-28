@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xian.mapper.SysAdminMapper">
+	<select id="getBooks" parameterType="books" resultType="books">
+		SELECT b.`id`,b.`bname`,b.`number`,b.`author`,b.`birth`,b.`edition`,s.`sname` FROM books b INNER JOIN sorts s ON b.`sid`=s.`id` 
+		<where>
+			<if test="bname!=null and bname!=''">
+				and  b.`bname` like "%${bname}%"
+			</if>
+			<if test="sid!=null and sid!=''">
+				and b.`sid`=#{sid}
+			</if>
+		</where>
+		limit #{start}, 8
+	</select>
+	
+	<!--查总记录  -->
+	<select id="getCount" parameterType="books" resultType="int">
+		SELECT count(b.`id`) FROM books
+		b INNER JOIN sorts s ON b.`sid`=s.`id` 
+		<where>
+			<if test="bname!=null and bname!=''">
+				and b.`bname` like "%${bname}%"
+			</if>
+			<if test="sid!=null and sid!=''">
+				and b.`sid`=#{sid}
+			</if>
+		</where>
+	</select>	
+	
+	<insert id="addBooks" parameterType="books" >
+		INSERT INTO books
+            (
+             `bname`,
+             `sid`,
+             `number`,
+             `author`,
+             `birth`,
+             `edition`)
+VALUES (
+        #{bname},
+       #{sid} ,
+        #{number},
+        #{author},
+        #{birth},
+        #{edition})
+	</insert>
+	
+	<select id="getBookById" parameterType="int" resultType="books">
+		SELECT b.`sid`,b.`id`,b.`bname`,b.`number`,b.`author`,b.`birth`,b.`edition`,s.`sname` FROM books b INNER JOIN sorts s ON b.`sid`=s.`id` 
+		where b.`id`=#{id}
+	</select>
+	
+	<update id="updateBooks" parameterType="books">
+		UPDATE `books`
+SET 
+  `bname` = #{bname},
+  `sid` = #{sid},
+  `number` = #{number},
+  `author` = #{author},
+  `birth` = #{birth},
+  `edition` =#{edition}
+WHERE `id` = #{id}
+	</update>
+	
+	<delete id="deleteBooks">
+		DELETE
+FROM `books`
+WHERE `id` = #{id}
+	</delete>
+	
+	<!-- 下面是用户SQL -->
+	<select id="getUsers" parameterType="users" resultType="users">
+		SELECT
+		  *
+		FROM `users`
+		<where>
+			<if test="uname!=null and uname!=''">
+				and uname like "%${uname}%"
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addUsers" parameterType="users">
+		INSERT INTO `users`
+            (
+             `uname`,
+             `code`,
+             `password`)
+VALUES (
+        #{uname},
+        #{code},
+        #{password})
+	</insert>
+	
+	<select id="getUserById" parameterType="int" resultType="users">
+				SELECT
+  *
+FROM `users` where id=#{id}
+	</select>
+	
+	<update id="updateUser" parameterType="users">
+		UPDATE `users`
+SET
+  `uname` = #{uname},
+  `code` = #{code},
+  `password` = #{password}
+WHERE `id` = #{id};
+	</update>
+	
+	<delete id="deleteUser" parameterType="int">
+		delete
+from `users`
+where `id` = #{id};
+	</delete>
+	
+	<select id="getSysAdmin" parameterType="users" resultType="sysAdmin">
+				SELECT
+  `id`,
+  `uname`,
+  `code`,
+  `password`
+FROM `sysadmin` WHERE   `code`=#{code} AND   `password`=#{password}
+	</select>
+	
+	<select id="selectUsers" parameterType="string" resultType="int">
+		SELECT
+   COUNT(`id`)
+FROM `users` WHERE `code`=#{code}
+		
+	</select>
+<!-- 	<sql id="customer">
+			<where>
+			<if test="custName!=null and custName!=''">
+				and c.`cust_name`LIKE "%${custName}%"
+			</if>
+			<if test="custSource!=null and custSource!=''">
+				and c.`cust_source`= #{custSource}
+			</if>
+			<if test="custIndustry != null and custIndustry != ''">
+				AND c.`cust_industry` = #{custIndustry}
+			</if>
+			<if test="custLevel !=null and custLevel !=''">
+				and c.`cust_level`= #{custLevel }
+			</if>
+		</where>
+	</sql>
+	<select id="getBaseDict" parameterType="String" resultType="basedict">
+			SELECT
+		  `dict_id`,
+		  `dict_type_code`,
+		  `dict_type_name`,
+		  `dict_item_name`,
+		  `dict_item_code`,
+		  `dict_sort`,
+		  `dict_enable`,
+		  `dict_memo`
+		FROM `base_dict`
+		WHERE `dict_type_code` = #{id};
+	</select>	
+
+	<select id="getCustomer" parameterType="queryvo" resultType="customer">
+			SELECT
+		  `cust_id`,
+		`cust_name`,
+		  s.`dict_item_name` cust_source,
+		  i.`dict_item_name` cust_industry,
+		  l.`dict_item_name` cust_level,
+		  `cust_phone`,
+		  `cust_mobile`,
+		  `cust_zipcode`
+		FROM `customer` c
+		LEFT JOIN `base_dict` s ON c.`cust_source` = s.`dict_id`
+		LEFT JOIN `base_dict` i ON c.`cust_industry` = i.`dict_id`
+		LEFT JOIN `base_dict` l ON c.`cust_level` = l.`dict_id`
+		<include refid="customer"/>
+		LIMIT #{start}, #{rows};	
+	</select>
+	
+	<select id="getCount" parameterType="queryvo" resultType="int">
+			SELECT
+		 count(1)
+		FROM `customer` c
+		LEFT JOIN `base_dict` s ON c.`cust_source` = s.`dict_id`
+		LEFT JOIN `base_dict` i ON c.`cust_industry` = i.`dict_id`
+		LEFT JOIN `base_dict` l ON c.`cust_level` = l.`dict_id`
+		<include refid="customer"/>
+	</select>
+	<select id="editCustomer" parameterType="int" resultType="customer">
+	SELECT
+		  `cust_id`,
+		  `cust_name`,
+		  `cust_user_id`,
+		  `cust_create_id`,
+		  `cust_source`,
+		  `cust_industry`,
+		  `cust_level`,
+		  `cust_linkman`,
+		  `cust_phone`,
+		  `cust_mobile`,
+		  `cust_zipcode`,
+		  `cust_address`,
+		  `cust_createtime`
+		FROM `customer`
+		WHERE `cust_id`= #{id}
+	</select>
+	
+	<update id="updateCustomer" parameterType="customer" >
+		UPDATE `customer`
+		<set>
+			<if test="cust_name!=null and cust_name!=''">
+			`cust_name` = #{cust_name},
+			</if>
+		 	<if test="cust_source!=null and cust_source!=''">
+		 		`cust_source` = #{cust_source},
+		 	</if>
+		  <if test="cust_industry!=null and cust_industry!=''">
+		  	  `cust_industry` = #{cust_industry},
+		  </if>
+			<if test="cust_level!=null and cust_level!=''">
+				`cust_level` = #{cust_level},
+			</if>
+		  <if test="cust_linkman!=null and cust_linkman!=''">
+		  	 `cust_linkman` = #{cust_linkman},
+		  </if>
+		 <if test="cust_phone!=null and cust_phone!=''">
+		 	 `cust_phone` = #{cust_phone},
+		 </if>
+		 <if test="cust_mobile!=null and cust_mobile!=''">
+		  `cust_mobile` = #{cust_mobile},
+		 </if>
+		 <if test="cust_zipcode!=null and cust_zipcode!=''">
+		 		  `cust_zipcode` = #{cust_zipcode},
+		 </if>
+		<if test="cust_address!=null and cust_address!=''">
+			  `cust_address` = #{cust_address},
+		</if>
+		</set>
+		WHERE `cust_id` = #{cust_id}
+	</update> -->
+</mapper>
